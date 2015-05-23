@@ -4,6 +4,8 @@ import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsHeader;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -17,6 +19,7 @@ public abstract class AbstractBasicDecoder implements FormatDecoder {
     protected final int numLines;
     protected final int rawLineByteWidth;
     protected final ByteBuffer rawLineCache;
+    protected final IntBuffer intCacheView;
     protected final int lineWidth;
     protected int arrayPos;
 
@@ -28,6 +31,8 @@ public abstract class AbstractBasicDecoder implements FormatDecoder {
         this.lineWidth = header.getDwWidth();
         this.rawLineByteWidth = header.getDdspf().getDwRGBBitCount() / 8 * header.getDwWidth();
         this.rawLineCache = ByteBuffer.allocate(rawLineByteWidth);
+        this.rawLineCache.order(ByteOrder.LITTLE_ENDIAN);
+        this.intCacheView = rawLineCache.asIntBuffer();
         this.arrayPos = 0;
     }
 
@@ -35,6 +40,7 @@ public abstract class AbstractBasicDecoder implements FormatDecoder {
         rawLineCache.rewind();
         rawLineCache.put(dds.getBdata(), arrayPos, rawLineByteWidth);
         rawLineCache.flip();
+        intCacheView.rewind();
         arrayPos += rawLineByteWidth;
     }
 

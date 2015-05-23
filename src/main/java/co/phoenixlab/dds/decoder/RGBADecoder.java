@@ -3,8 +3,6 @@ package co.phoenixlab.dds.decoder;
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsPixelFormat;
 
-import java.nio.IntBuffer;
-
 import static java.lang.Integer.numberOfTrailingZeros;
 
 public class RGBADecoder extends AbstractBasicDecoder {
@@ -21,7 +19,6 @@ public class RGBADecoder extends AbstractBasicDecoder {
 
     private final boolean nativeARGB;
 
-    private final IntBuffer intCacheView;
 
     public RGBADecoder(Dds dds) {
         super(dds);
@@ -39,7 +36,6 @@ public class RGBADecoder extends AbstractBasicDecoder {
                 (gMask == 0x0000FF00) &&
                 (bMask == 0x000000FF) &&
                 (aMask == 0xFF000000);
-        intCacheView = rawLineCache.asIntBuffer();
     }
 
     public int[] decodeLine() {
@@ -47,7 +43,6 @@ public class RGBADecoder extends AbstractBasicDecoder {
             return null;
         }
         loadNextLineIntoCache();
-        intCacheView.rewind();
         int[] ret = new int[lineWidth];
         if (nativeARGB) {
             intCacheView.get(ret);
