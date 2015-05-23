@@ -109,6 +109,13 @@ public class DdsPixelFormat implements DdsReadable {
     }
 
     /**
+     * @return {@link #dwFourCC} as a String
+     */
+    public String getDwFourCCAsString() {
+        return new String(dwFourCC);
+    }
+
+    /**
      * @return {@link #dwRGBBitCount}
      */
     public int getDwRGBBitCount() {
