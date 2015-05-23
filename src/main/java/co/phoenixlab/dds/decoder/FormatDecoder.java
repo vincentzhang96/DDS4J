@@ -1,9 +1,10 @@
 package co.phoenixlab.dds.decoder;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface FormatDecoder {
+public interface FormatDecoder extends Iterable<int[]> {
 
     /**
      * Decodes a line, returning an array of 0xAARRGGBB ints, or null if no lines remain to be decoded.
@@ -17,6 +18,16 @@ public interface FormatDecoder {
      * @see #decodeLine()
      */
     Iterator<int[]> lineIterator();
+
+    @Override
+    default Iterator<int[]> iterator() {
+        return lineIterator();
+    }
+
+    @Override
+    default void forEach(Consumer<? super int[]> action) {
+        lineStream().forEach(action);
+    }
 
     /**
      * Returns a stream over lazily decoded lines.

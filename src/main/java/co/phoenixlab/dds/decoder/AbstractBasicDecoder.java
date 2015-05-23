@@ -39,9 +39,13 @@ public abstract class AbstractBasicDecoder implements FormatDecoder {
     }
 
     public Stream<int[]> lineStream() {
-        Spliterator<int[]> spliterator = Spliterators.spliterator(lineIterator(), numLines,
+        return StreamSupport.stream(spliterator(), false);
+    }
+
+    @Override
+    public Spliterator<int[]> spliterator() {
+        return Spliterators.spliterator(lineIterator(), numLines,
                 Spliterator.SIZED | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED);
-        return StreamSupport.stream(spliterator, false);
     }
 
     public Iterator<int[]> lineIterator() {
