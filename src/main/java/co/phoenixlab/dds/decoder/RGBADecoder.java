@@ -7,7 +7,6 @@ import static java.lang.Integer.numberOfTrailingZeros;
 
 public class RGBADecoder extends AbstractBasicDecoder {
 
-
     private final int rShift;
     private final int rMask;
     private final int gShift;
@@ -18,7 +17,6 @@ public class RGBADecoder extends AbstractBasicDecoder {
     private final int aMask;
 
     private final boolean nativeARGB;
-
 
     public RGBADecoder(Dds dds) {
         super(dds);
