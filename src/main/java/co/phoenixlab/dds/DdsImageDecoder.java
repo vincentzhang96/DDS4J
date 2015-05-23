@@ -4,7 +4,8 @@ import ar.com.hjg.pngj.ImageInfo;
 import ar.com.hjg.pngj.ImageLineHelper;
 import ar.com.hjg.pngj.ImageLineInt;
 import ar.com.hjg.pngj.PngWriter;
-import co.phoenixlab.dds.decoder.RGBADecoder;
+import co.phoenixlab.dds.decoder.Decoders;
+import co.phoenixlab.dds.decoder.FormatDecoder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,9 +29,7 @@ public class DdsImageDecoder {
 
     public void convertToPNG(Dds dds, OutputStream outputStream) throws IOException {
         DdsHeader header = dds.getHeader();
-        //  TEMP - replace with decoder selector
-        RGBADecoder decoder = new RGBADecoder(dds);
-        
+        FormatDecoder decoder = Decoders.getDecoder(dds);
         ImageInfo imageInfo = new ImageInfo(header.getDwWidth(), header.getDwHeight(), 8, true);
         PngWriter pngWriter = new PngWriter(outputStream, imageInfo);
         ImageLineInt imageLine = new ImageLineInt(imageInfo);
