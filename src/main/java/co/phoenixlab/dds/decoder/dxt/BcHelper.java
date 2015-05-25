@@ -202,7 +202,7 @@ final class BcHelper {
                 (data[offset + 4] << 8) & 0x00FF00 |
                 data[offset + 5] & 0x0000FF;
         int[] ret = new int[RET_SIZE];
-        for (int i = 7; i >= 0; i++) {
+        for (int i = 7; i >= 0; i--) {
             ret[i] = row1 >> 3 * i & 0b111;
             ret[i + 8] = row2 >> 3 * i & 0b111;
         }
