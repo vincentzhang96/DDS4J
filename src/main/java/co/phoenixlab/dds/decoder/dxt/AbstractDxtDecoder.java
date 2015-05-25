@@ -4,7 +4,6 @@ import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsHeader;
 import co.phoenixlab.dds.decoder.FormatDecoder;
 
-import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -23,7 +22,7 @@ public abstract class AbstractDxtDecoder implements FormatDecoder {
     protected final int blockRowWidth;
     protected final int blockRowBytes;
     protected final int[] decodedBlocks;
-    protected final ByteBuffer rawBlockLineCache;
+    protected final byte[] rawBlockLineCache;
     protected int arrayPos;
 
     public AbstractDxtDecoder(Dds dds, int blockByteSize) {
@@ -38,15 +37,14 @@ public abstract class AbstractDxtDecoder implements FormatDecoder {
         this.blockRowWidth = (this.lineWidth + 3) / 4;
         this.blockRowBytes = this.blockByteSize * this.blockRowWidth;
         this.decodedBlocks = new int[16 * this.blockRowWidth];
-        this.rawBlockLineCache = ByteBuffer.allocate(this.blockRowBytes);
+        this.rawBlockLineCache = new byte[this.blockRowBytes];
         this.arrayPos = 0;
     }
 
     protected void loadNextBlockRowIntoCache() {
-        rawBlockLineCache.rewind();
-        rawBlockLineCache.put(dds.getBdata(), arrayPos, blockRowBytes);
-        rawBlockLineCache.flip();
+        System.arraycopy(dds.getBdata(), arrayPos, rawBlockLineCache, 0, blockRowBytes);
         arrayPos += blockRowBytes;
+        ++currBlockRow;
     }
 
     public Stream<int[]> lineStream() {
