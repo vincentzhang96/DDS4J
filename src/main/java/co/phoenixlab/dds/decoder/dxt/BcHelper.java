@@ -74,10 +74,10 @@ final class BcHelper {
         i += 2;
         int r0, g0, b0, r1, g1, b1;
         //  Extract each component
-        r0 = (rawColor0 & RGB565_RED_MASK) >> 9;  //   >> 11) << 3;
+        r0 = (rawColor0 & RGB565_RED_MASK) >> 8;  //   >> 11) << 3;
         g0 = (rawColor0 & RGB565_GREEN_MASK) >> 3;   //  >> 5) << 2
         b0 = (rawColor0 & RGB565_BLUE_MASK) << 3;
-        r1 = (rawColor1 & RGB565_RED_MASK) >> 9;  //   >> 11) << 3;
+        r1 = (rawColor1 & RGB565_RED_MASK) >> 8;  //   >> 11) << 3;
         g1 = (rawColor1 & RGB565_GREEN_MASK) >> 3;   //  >> 5) << 2
         b1 = (rawColor1 & RGB565_BLUE_MASK) << 3;
         //  Construct ARGB colors
