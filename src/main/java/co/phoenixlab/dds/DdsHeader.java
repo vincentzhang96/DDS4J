@@ -224,7 +224,7 @@ public class DdsHeader implements DdsReadable {
     public void validate() throws InvalidDdsException {
         verifyThat(dwSize, i -> i == DW_SIZE, "Invalid DDSHeader: dwSize not " + DW_SIZE);
         verifyThat(dwFlags, s -> s.containsAll(Flags.REQUIRED), "Invalid DDSHeader: dwFlags missing required flags");
-        verifyThat(dwReserved1, i -> Arrays.equals(i, DW_RESERVED_1), "Invalid DDSHeader: dwReserved1 not empty");
+//        verifyThat(dwReserved1, i -> Arrays.equals(i, DW_RESERVED_1), "Invalid DDSHeader: dwReserved1 not empty");
         ddspf.validate();
         verifyThat(dwCaps, s -> s.containsAll(Caps.REQUIRED), "Invalid DDSHeader: dwCaps missing required caps");
         verifyThat(dwCaps3, Set::isEmpty, "Invalid DDSHeader: dwCaps3 is not empty");
