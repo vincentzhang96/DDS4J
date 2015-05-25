@@ -36,8 +36,8 @@ final class BcHelper {
     }
 
     private int getShort(byte[] data, int offset) {
-        return data[offset] << 8 & 0x0000FF00 |
-                data[offset + 1] & 0x000000FF;
+        return data[offset + 1] << 8 & 0x0000FF00 |
+                data[offset] & 0x000000FF;
     }
 
     int[] decompressBc1Block(byte[] data) {
@@ -74,18 +74,25 @@ final class BcHelper {
         i += 2;
         int r0, g0, b0, r1, g1, b1;
         //  Extract each component
-        r0 = (rawColor0 & RGB565_RED_MASK) >> 8;  //   >> 11) << 3;
-        g0 = (rawColor0 & RGB565_GREEN_MASK) >> 3;   //  >> 5) << 2
-        b0 = (rawColor0 & RGB565_BLUE_MASK) << 3;
-        r1 = (rawColor1 & RGB565_RED_MASK) >> 8;  //   >> 11) << 3;
-        g1 = (rawColor1 & RGB565_GREEN_MASK) >> 3;   //  >> 5) << 2
-        b1 = (rawColor1 & RGB565_BLUE_MASK) << 3;
+        r0 = (rawColor0 & RGB565_RED_MASK) >> 11;
+        g0 = (rawColor0 & RGB565_GREEN_MASK) >> 5;
+        b0 = (rawColor0 & RGB565_BLUE_MASK);
+        r1 = (rawColor1 & RGB565_RED_MASK) >> 11;
+        g1 = (rawColor1 & RGB565_GREEN_MASK) >> 5;
+        b1 = (rawColor1 & RGB565_BLUE_MASK);
+        //  Rescale from 5/6 bit to 8 bit
+        r0 = (r0 * 0x100 / 0b100000) & 0xFF;
+        r1 = (r1 * 0x100 / 0b100000) & 0xFF;
+        g0 = (g0 * 0x100 / 0b1000000) & 0xFF;
+        g1 = (g1 * 0x100 / 0b1000000) & 0xFF;
+        b0 = (b0 * 0x100 / 0b100000) & 0xFF;
+        b1 = (b1 * 0x100 / 0b100000) & 0xFF;
         //  Construct ARGB colors
         int[] colors = new int[4];
         //  Don't need to mask because xn do not have any high bits set
         colors[0] = 0xFF000000 | r0 << 16 | g0 << 8 | b0;
         colors[1] = 0xFF000000 | r1 << 16 | g1 << 8 | b1;
-        if (rawColor0 > rawColor1) {
+        if (rawColor0 < rawColor1) {
             //  c2 = (c0+c1)/2
             colors[2] = 0xFF000000 | ((r0 + r1) / 2) << 16 | ((g0 + g1) / 2) << 8 | ((b0 + b1) / 2);
             //  c3 = transparent
