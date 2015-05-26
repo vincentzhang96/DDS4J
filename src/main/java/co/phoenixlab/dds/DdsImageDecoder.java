@@ -8,6 +8,7 @@ import co.phoenixlab.dds.decoder.Decoders;
 import co.phoenixlab.dds.decoder.FormatDecoder;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -15,6 +16,32 @@ public class DdsImageDecoder {
 
     public DdsImageDecoder() {
 
+    }
+
+    public byte[] convertToRawARGB8(Dds dds) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            convertToRawARGB8(dds, byteArrayOutputStream);
+        } catch (IOException e) {
+            //  Impossible
+        }
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public void convertToRawARGB8(Dds dds, OutputStream outputStream) throws IOException {
+        DataOutputStream dataOutputStream;
+        if (outputStream instanceof DataOutputStream) {
+            dataOutputStream = (DataOutputStream) outputStream;
+        } else {
+            dataOutputStream = new DataOutputStream(outputStream);
+        }
+        FormatDecoder decoder = Decoders.getDecoder(dds);
+        for (int[] ints : decoder) {
+            for (int pixel : ints) {
+                dataOutputStream.writeInt(pixel);
+            }
+        }
+        outputStream.flush();
     }
 
     public byte[] convertToPNG(Dds dds) {
