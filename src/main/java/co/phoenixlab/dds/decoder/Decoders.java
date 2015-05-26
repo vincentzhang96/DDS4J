@@ -2,6 +2,7 @@ package co.phoenixlab.dds.decoder;
 
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsPixelFormat;
+import co.phoenixlab.dds.decoder.dxt.Dxt1Decoder;
 import co.phoenixlab.dds.decoder.dxt.Dxt5Decoder;
 
 import java.util.Set;
@@ -39,6 +40,9 @@ public class Decoders {
         switch (dwFourCC) {
             case "\0\0\0\0": {
                 throw new IllegalArgumentException("The provided DDS file has DDPF_FOURCC flag set but no dwFourCC");
+            }
+            case "DXT1": {
+                return new Dxt1Decoder(dds);
             }
             case "DXT5": {
                 return new Dxt5Decoder(dds);
