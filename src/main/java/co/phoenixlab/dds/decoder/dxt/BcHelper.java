@@ -141,7 +141,7 @@ final class BcHelper {
         for (int row = 0; row < 4; row++) {
             int rowShort = getShort(data, offset + row * 2);
             for (int col = 3; col >= 0; col++) {
-                //  Sorcery
+                //  Wizardry
                 //  Sets the pixel at (row, col) to have the correct alpha value extracted from the BC2 alpha block
                 ret[retOffset + col + row * 4] = ret[retOffset + col + row * 4] & 0x00FFFFFF |
                         (rowShort >> 4 * col & 0xF) << 28;
