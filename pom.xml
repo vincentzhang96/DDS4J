@@ -6,7 +6,7 @@
 
     <groupId>co.phoenixlab.dds</groupId>
     <artifactId>DDS4J</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <dependencies>
         <dependency>
