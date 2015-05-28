@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
+import java.util.EnumSet;
+import java.util.Set;
 
 import static co.phoenixlab.dds.InternalUtils.verifyThat;
 import static co.phoenixlab.dds.InternalUtils.verifyThatNot;
@@ -68,11 +70,10 @@ public class Dds implements DdsReadable {
         }
         if (header.getDwFlags().contains(DdsHeader.Flags.DDSD_LINEARSIZE)) {
             bdata = new byte[header.getDwPitchOrLinearSize()];
-            inputStream.readFully(bdata);
         } else {
-            //TODO
-            System.err.println("UNSUPPORTED " + header.getDwFlags().toString());
+            bdata = new byte[calculateDataSize()];
         }
+        inputStream.readFully(bdata);
         validate();
     }
 
@@ -97,17 +98,18 @@ public class Dds implements DdsReadable {
         if (header.getDwFlags().contains(DdsHeader.Flags.DDSD_LINEARSIZE)) {
             buf = ByteBuffer.allocate(header.getDwPitchOrLinearSize());
             bdata = new byte[header.getDwPitchOrLinearSize()];
-            //noinspection StatementWithEmptyBody
-            while ((read = byteChannel.read(buf)) > 0);
-            if (read < 0) {
-                throw new EOFException();
-            }
-            buf.flip();
-            buf.get(bdata);
         } else {
-            //TODO
-            System.err.println("UNSUPPORTED " + header.getDwFlags().toString());
+            int sz = calculateDataSize();
+            buf = ByteBuffer.allocate(sz);
+            bdata = new byte[sz];
         }
+        //noinspection StatementWithEmptyBody
+        while ((read = byteChannel.read(buf)) > 0);
+        if (read < 0) {
+            throw new EOFException();
+        }
+        buf.flip();
+        buf.get(bdata);
         validate();
     }
 
@@ -124,10 +126,27 @@ public class Dds implements DdsReadable {
             bdata = new byte[header.getDwPitchOrLinearSize()];
             buf.get(bdata);
         } else {
-            //TODO
-            System.err.println("UNSUPPORTED " + header.getDwFlags().toString());
+            bdata = new byte[calculateDataSize()];
+            buf.get(bdata);
         }
         validate();
+    }
+
+    private int calculateDataSize() {
+        int numPixels = header.getDwWidth() * header.getDwHeight();
+        Set<DdsPixelFormat.Flags> flags = header.getDdspf().getDwFlags();
+        int bytesPerPixel = 0;
+        if (flags.contains(DdsPixelFormat.Flags.DDPF_ALPHA)) {
+            bytesPerPixel = 1;
+        }
+        boolean hasAlpha = flags.contains(DdsPixelFormat.Flags.DDPF_ALPHAPIXELS);
+        Set<DdsPixelFormat.Flags> rgbBitCountValid = EnumSet.of(DdsPixelFormat.Flags.DDPF_LUMINANCE,
+                DdsPixelFormat.Flags.DDPF_RGB, DdsPixelFormat.Flags.DDPF_YUV);
+        rgbBitCountValid.retainAll(flags);
+        if (!rgbBitCountValid.isEmpty()) {
+            bytesPerPixel = header.getDdspf().getDwRGBBitCount() / 8;
+        }
+        return numPixels * bytesPerPixel;
     }
 
     @Override
