@@ -6,7 +6,7 @@ deploy:
   provider: releases
   api_key:
     secure: x5yL4o0kJlVsuUfSfTkYLe+Hekgg7CEUdX4MO6kBgYGhy0S5T1MBkNVrEizqYr/5bIXfxOW7cVYQl1YkIdOGdlg/7XcoT3MLfRLHxG+DoE9wId4nlwskRcyAoMmIQMq18+d6NFEhmGDJo5RiRaXx3OLfX2Y7H5W4J/Ei23f3IjGZLAmBxAYgSKnbapQ68dJu/LrqfIOTSnG2kdPl1X0R0WA0MDC0apYcvmaq/KHsPvEwxUBbJ3kjQaedqpjV67QYPVQ0JBgp79IPFgRMb5qfSsMsac3Sp3SiLCQaLE2TySJot4+x0ic+splyTqjg09Tg3hgejONKtLnP/RirAaPqi/e06zeF8J0u2qoY3oOFnm62FC/DSorg18JFf2Pdl25VaFmqjscgzHOxUD4RJs58G8uzkbulQRl4S8QFMjqdxsJVTJVnES2OUOvaIx8vClJ5yFTYjXwd4xRpnLNNIspgUFlzQAddwUX5OTd+gLEePeCptQxTdo/i0duqkWRy7SuqRS5MArEjBhE1h18pIJuGcGjxYNyR+48j2na7vguyYw7I71En7f6MWh/p28es/nZx6Yy8OmA01WxmfoA6eGNlk/X0hEjRD7LQkONnFdRC0CrvYXiKDJ8/dSMptj6TLCSUptWuQ36mdVT8zE0AVAHG5WY4NoQuReQcxCfJ8vp7fUw=
-  file: "target/DDS4J-1.0.1.jar"
+  file: "target/DDS4J-1.0.2.jar"
   skip_cleanup: true
   on:
     tags: true
