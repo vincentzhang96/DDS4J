@@ -225,9 +225,9 @@ public class DdsPixelFormat implements DdsReadable {
         DDPF_ALPHAPIXELS(0x1),
         /**
          * Used in some older DDS files for alpha channel only uncompressed data; {@link #dwABitMask} contains valid
+         * data
          * <p>
          * {@code bitmask = 0x2}
-         * data
          */
         DDPF_ALPHA(0x2),
         /**
