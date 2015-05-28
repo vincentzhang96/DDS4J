@@ -202,12 +202,12 @@ final class BcHelper {
 
 
     private int[] convert16x3(byte[] data, int offset) {
-        int row1 = (data[offset] << 16) & 0xFF0000 |
+        int row1 = (data[offset + 2] << 16) & 0xFF0000 |
                 (data[offset + 1] << 8) & 0x00FF00 |
-                data[offset + 2] & 0x0000FF;
-        int row2 = (data[offset + 3] << 16) & 0xFF0000 |
+                data[offset] & 0x0000FF;
+        int row2 = (data[offset + 5] << 16) & 0xFF0000 |
                 (data[offset + 4] << 8) & 0x00FF00 |
-                data[offset + 5] & 0x0000FF;
+                data[offset + 3] & 0x0000FF;
         int[] ret = new int[RET_SIZE];
         for (int i = 7; i >= 0; i--) {
             ret[i] = row1 >> 3 * i & 0b111;
