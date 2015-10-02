@@ -61,13 +61,10 @@ public class DdsImageDecoder {
         PngWriter pngWriter = new PngWriter(outputStream, imageInfo);
         ImageLineInt imageLine = new ImageLineInt(imageInfo);
         for (int[] ints : decoder) {
-            for (int i = 0; i < ints.length; i++) {
-                ImageLineHelper.setPixelRGBA8(imageLine, i, ints[i]);
-            }
+            ImageLineHelper.setPixelsRGBA8(imageLine, ints);
             pngWriter.writeRow(imageLine);
         }
         pngWriter.end();
     }
-
 
 }
