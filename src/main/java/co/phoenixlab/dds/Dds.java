@@ -69,7 +69,7 @@ public class Dds implements DdsReadable {
             header10.read(inputStream);
         }
         if (header.getDwFlags().contains(DdsHeader.Flags.DDSD_LINEARSIZE)) {
-            bdata = new byte[header.getDwPitchOrLinearSize()];
+            bdata = new byte[calculateCompressedDataSize()];
         } else {
             bdata = new byte[calculateDataSize()];
         }
@@ -95,14 +95,14 @@ public class Dds implements DdsReadable {
             header10 = new DdsHeaderDxt10();
             header10.read(byteChannel);
         }
+        int sz;
         if (header.getDwFlags().contains(DdsHeader.Flags.DDSD_LINEARSIZE)) {
-            buf = ByteBuffer.allocate(header.getDwPitchOrLinearSize());
-            bdata = new byte[header.getDwPitchOrLinearSize()];
+            sz = calculateCompressedDataSize();
         } else {
-            int sz = calculateDataSize();
-            buf = ByteBuffer.allocate(sz);
-            bdata = new byte[sz];
+            sz = calculateDataSize();
         }
+        buf = ByteBuffer.allocate(sz);
+        bdata = new byte[sz];
         //noinspection StatementWithEmptyBody
         while ((read = byteChannel.read(buf)) > 0);
         if (read < 0) {
@@ -123,18 +123,56 @@ public class Dds implements DdsReadable {
             header10.read(buf);
         }
         if (header.getDwFlags().contains(DdsHeader.Flags.DDSD_LINEARSIZE)) {
-            bdata = new byte[header.getDwPitchOrLinearSize()];
-            buf.get(bdata);
+            bdata = new byte[calculateCompressedDataSize()];
         } else {
             bdata = new byte[calculateDataSize()];
-            buf.get(bdata);
         }
+        buf.get(bdata);
         validate();
     }
+
+    private int calculateCompressedDataSize() {
+        //  Turns out the pitchOrLinearSize field is actually unreliable
+        //  So we have to calculate out the size ourselves
+        DdsPixelFormat pixelFormat = getHeader().getDdspf();
+        Set<DdsPixelFormat.Flags> flags = pixelFormat.getDwFlags();
+        if (flags.contains(DdsPixelFormat.Flags.DDPF_FOURCC)) {
+            int blockSize = getBlockSize(pixelFormat.getDwFourCCAsString());
+            //  Blocks are 4x4, so determine the dimension in blocks
+            int w = getHeader().getDwWidth();
+            int h = getHeader().getDwHeight();
+            //  Since integer division floors, we must round up to the nearest multiple of 4
+            int blockWidth = (w + 3) / 4;
+            int blockHeight = (h + 3) / 4;
+            return blockWidth * blockHeight * blockSize;
+        }
+        //  For now fall back on what they give us
+        //  TODO handle the odd corner cases
+        return getHeader().getDwPitchOrLinearSize();
+    }
+
+    private int getBlockSize(String dwFourCC) {
+        switch (dwFourCC) {
+            case "\0\0\0\0": {
+                throw new IllegalArgumentException("The provided DDS file has DDPF_FOURCC flag set " +
+                        "but no dwFourCC");
+            }
+            case "DXT1": {
+                return 8;
+            }
+            default: {
+                return 16;
+            }
+        }
+    }
+
 
     private int calculateDataSize() {
         int numPixels = header.getDwWidth() * header.getDwHeight();
         Set<DdsPixelFormat.Flags> flags = header.getDdspf().getDwFlags();
+        if (flags.contains(DdsPixelFormat.Flags.DDPF_FOURCC)) {
+            return calculateCompressedDataSize();
+        }
         int bytesPerPixel = 0;
         if (flags.contains(DdsPixelFormat.Flags.DDPF_ALPHA)) {
             bytesPerPixel = 1;
