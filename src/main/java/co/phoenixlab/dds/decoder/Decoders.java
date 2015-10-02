@@ -3,6 +3,7 @@ package co.phoenixlab.dds.decoder;
 import co.phoenixlab.dds.Dds;
 import co.phoenixlab.dds.DdsPixelFormat;
 import co.phoenixlab.dds.decoder.dxt.Dxt1Decoder;
+import co.phoenixlab.dds.decoder.dxt.Dxt3Decoder;
 import co.phoenixlab.dds.decoder.dxt.Dxt5Decoder;
 
 import java.util.Set;
@@ -43,6 +44,9 @@ public class Decoders {
             }
             case "DXT1": {
                 return new Dxt1Decoder(dds);
+            }
+            case "DXT3": {
+                return new Dxt3Decoder(dds);
             }
             case "DXT5": {
                 return new Dxt5Decoder(dds);
