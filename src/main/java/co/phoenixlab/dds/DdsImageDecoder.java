@@ -32,7 +32,7 @@ public class DdsImageDecoder {
     private static final IntUnaryOperator SET_BLUE = i -> i & 255;
     private static final IntUnaryOperator SET_ALPHA = i -> (i & 255) << 24;
 
-    private static final IntUnaryOperator[] SETTERS = new  IntUnaryOperator[] {
+    private static final IntUnaryOperator[] SETTERS = new IntUnaryOperator[]{
         SET_RED,
         SET_GREEN,
         SET_BLUE,
@@ -41,80 +41,6 @@ public class DdsImageDecoder {
 
     public DdsImageDecoder() {
 
-    }
-
-    public byte[] convertToRawARGB8(Dds dds) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            convertToRawARGB8(dds, byteArrayOutputStream);
-        } catch (IOException e) {
-            //  Impossible
-        }
-        return byteArrayOutputStream.toByteArray();
-    }
-
-    public void convertToRawARGB8(Dds dds, OutputStream outputStream) throws IOException {
-        DataOutputStream dataOutputStream;
-        if (outputStream instanceof DataOutputStream) {
-            dataOutputStream = (DataOutputStream) outputStream;
-        } else {
-            dataOutputStream = new DataOutputStream(outputStream);
-        }
-        FormatDecoder decoder = Decoders.getDecoder(dds);
-        for (int[] ints : decoder) {
-            for (int pixel : ints) {
-                dataOutputStream.writeInt(pixel);
-            }
-        }
-        outputStream.flush();
-    }
-
-    public byte[] convertToPNG(Dds dds) {
-        return convertToPNG(dds, "");
-    }
-
-
-    public byte[] convertToPNG(Dds dds, String swizzle) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        try {
-            convertToPNG(dds, byteArrayOutputStream, swizzle);
-        } catch (IOException e) {
-            //  Impossible
-        }
-        return byteArrayOutputStream.toByteArray();
-    }
-
-
-    public void convertToPNG(Dds dds, OutputStream outputStream) throws IOException {
-        convertToPNG(dds, outputStream, "");
-    }
-
-    public void convertToPNG(Dds dds, OutputStream outputStream, String swizzle) throws IOException {
-        DdsHeader header = dds.getHeader();
-        FormatDecoder decoder = Decoders.getDecoder(dds);
-        ImageInfo imageInfo = new ImageInfo(header.getDwWidth(), header.getDwHeight(), 8, true);
-        PngWriter pngWriter = new PngWriter(outputStream, imageInfo);
-        ImageLineInt imageLine = new ImageLineInt(imageInfo);
-        for (int[] ints : decoder) {
-            swizzle(ints, swizzle);
-            ImageLineHelper.setPixelsRGBA8(imageLine, ints);
-            pngWriter.writeRow(imageLine);
-        }
-        pngWriter.end();
-    }
-
-    private void swizzle(int[] ints, String swizzle) {
-        if (swizzle.isEmpty()) {
-            return;
-        }
-
-        //  Build swizzler
-        IntUnaryOperator swizzler = SWIZZLER_CACHE.computeIfAbsent(swizzle, DdsImageDecoder::buildSwizzler);
-
-        //  Apply
-        for (int i = 0; i < ints.length; i++) {
-            ints[i] = swizzler.applyAsInt(ints[i]);
-        }
     }
 
     private static IntUnaryOperator buildSwizzler(String swizzle) {
@@ -176,6 +102,83 @@ public class DdsImageDecoder {
                 return GET_MAX;
             default:
                 throw new IllegalArgumentException("Invalid swizzle value");
+        }
+    }
+
+    public byte[] convertToRawARGB8(Dds dds) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            convertToRawARGB8(dds, byteArrayOutputStream);
+        } catch (IOException e) {
+            //  Impossible
+        }
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public void convertToRawARGB8(Dds dds, OutputStream outputStream) throws IOException {
+        DataOutputStream dataOutputStream;
+        if (outputStream instanceof DataOutputStream) {
+            dataOutputStream = (DataOutputStream) outputStream;
+        } else {
+            dataOutputStream = new DataOutputStream(outputStream);
+        }
+
+        FormatDecoder decoder = Decoders.getDecoder(dds);
+        for (int[] ints : decoder) {
+            for (int pixel : ints) {
+                dataOutputStream.writeInt(pixel);
+            }
+        }
+
+        outputStream.flush();
+    }
+
+    public byte[] convertToPNG(Dds dds) {
+        return convertToPNG(dds, "");
+    }
+
+    public byte[] convertToPNG(Dds dds, String swizzle) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try {
+            convertToPNG(dds, byteArrayOutputStream, swizzle);
+        } catch (IOException e) {
+            //  Impossible
+        }
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public void convertToPNG(Dds dds, OutputStream outputStream) throws IOException {
+        convertToPNG(dds, outputStream, "");
+    }
+
+    public void convertToPNG(Dds dds, OutputStream outputStream, String swizzle) throws IOException {
+        DdsHeader header = dds.getHeader();
+        FormatDecoder decoder = Decoders.getDecoder(dds);
+        ImageInfo imageInfo = new ImageInfo(header.getDwWidth(), header.getDwHeight(), 8, true);
+        PngWriter pngWriter = new PngWriter(outputStream, imageInfo);
+        ImageLineInt imageLine = new ImageLineInt(imageInfo);
+        for (int[] ints : decoder) {
+            swizzle(ints, swizzle);
+            ImageLineHelper.setPixelsRGBA8(imageLine, ints);
+            pngWriter.writeRow(imageLine);
+        }
+
+        pngWriter.end();
+    }
+
+    private void swizzle(int[] ints, String swizzle) {
+        if (swizzle.isEmpty()) {
+            return;
+        }
+
+        //  Build swizzler
+        IntUnaryOperator swizzler = SWIZZLER_CACHE.computeIfAbsent(swizzle, DdsImageDecoder::buildSwizzler);
+
+        //  Apply
+        for (int i = 0; i < ints.length; i++) {
+            ints[i] = swizzler.applyAsInt(ints[i]);
         }
     }
 
