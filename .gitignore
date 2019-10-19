@@ -60,3 +60,6 @@ $RECYCLE.BIN/
 
 # Maven
 target/
+
+# IntelliJ
+*.iml
